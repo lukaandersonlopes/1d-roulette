@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1D Roulette - Turnê Mundial</title>
+    <title>1D Roulette - Draft da Turnê</title>
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -15,19 +15,48 @@
         h1 { color: #d81b60; font-size: 2.5em; margin-bottom: 5px; }
         .subtitle { color: #888; margin-bottom: 20px; }
         
-        .controls { margin-bottom: 30px; }
-        select {
+        .controls { margin-bottom: 20px; }
+        select, button {
             padding: 10px 15px;
             font-size: 16px;
             border-radius: 10px;
             border: 2px solid #d81b60;
-            background: white;
-            color: #d81b60;
             font-weight: bold;
-            outline: none;
             cursor: pointer;
+            margin: 5px;
         }
+        select { background: white; color: #d81b60; outline: none; }
+        button { background-color: #d81b60; color: white; transition: 0.2s; }
+        button:hover:not(:disabled) { background-color: #ad1457; transform: scale(1.05); }
+        button:disabled { background-color: #f8bbd0; border-color: #f8bbd0; cursor: not-allowed; transform: none; }
 
+        /* Estilo da Equipe Formada (Os 5 Slots) */
+        .team-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .slot {
+            width: 120px;
+            height: 150px;
+            background: #fff;
+            border: 2px dashed #d81b60;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            padding: 5px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .slot.filled { border-style: solid; background: #fdf0f4; }
+        .slot-name { font-weight: bold; color: #d81b60; margin-bottom: 5px; text-align: center; }
+        .slot-stats { font-size: 11px; text-align: left; width: 100%; }
+
+        /* A Carta do Sorteio Atual */
         .card { 
             background: white; 
             border-radius: 15px; 
@@ -37,72 +66,40 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
             display: none; 
             border-top: 5px solid #d81b60;
-            transition: transform 0.1s; /* Para o efeito de tremer */
         }
         
-        /* Classe adicionada durante o giro para dar emoção */
-        .spinning {
-            animation: shake 0.2s infinite;
-            filter: blur(1px);
-        }
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            50% { transform: translate(-1px, -1px) rotate(-1deg); }
-            100% { transform: translate(1px, -2px) rotate(1deg); }
-        }
-
-        .member-photo {
-            width: 100%;
-            height: 250px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            background-color: #f8bbd0;
-        }
-
-        button { 
-            background-color: #d81b60; 
-            color: white; 
-            border: none; 
-            padding: 15px 40px; 
-            font-size: 20px; 
-            font-weight: bold;
-            border-radius: 30px; 
-            cursor: pointer; 
-            box-shadow: 0 4px 6px rgba(216, 27, 96, 0.3);
-            transition: all 0.2s; 
-            margin-top: 10px;
-        }
-        button:hover { background-color: #ad1457; transform: scale(1.05); }
-        button:disabled { background-color: #f48fb1; cursor: not-allowed; transform: none; }
-        
-        .member-name { font-size: 26px; font-weight: bold; color: #111; margin-bottom: 5px; }
+        .member-name { font-size: 24px; font-weight: bold; color: #111; margin-bottom: 5px; }
         .era { font-style: italic; color: #d81b60; font-weight: bold; font-size: 14px; margin-bottom: 10px; }
         .stats { margin-top: 15px; font-size: 14px; text-align: left; background: #fdf0f4; padding: 10px; border-radius: 8px; }
-        .stats p { margin: 5px 0; border-bottom: 1px solid #f8bbd0; padding-bottom: 5px; }
-        .stats p:last-child { border-bottom: none; }
-        .passiva { margin-top: 15px; font-size: 13px; color: #555; font-style: italic; text-align: center;}
+        .passiva { margin-top: 15px; font-size: 12px; color: #555; font-style: italic; text-align: center;}
     </style>
 </head>
 <body>
-    <h1>🎤 1D Roulette</h1>
-    <p class="subtitle">Prepare-se para a Turnê Mundial. Filtre o álbum e monte sua equipe!</p>
+    <h1>🎤 1D Roulette: O Draft</h1>
+    <p class="subtitle" id="statusDraft">Gire a roleta para formar sua equipe (0/5 recrutados)</p>
+
+    <div class="team-container" id="teamSlots">
+        <div class="slot" id="slot-0">Vazio</div>
+        <div class="slot" id="slot-1">Vazio</div>
+        <div class="slot" id="slot-2">Vazio</div>
+        <div class="slot" id="slot-3">Vazio</div>
+        <div class="slot" id="slot-4">Vazio</div>
+    </div>
 
     <div class="controls">
         <select id="eraFilter">
-            <option value="Todas">Todas as Eras (Aleatório)</option>
+            <option value="Todas">Todas as Eras</option>
             <option value="Up All Night">Up All Night</option>
             <option value="Take Me Home">Take Me Home</option>
             <option value="Midnight Memories">Midnight Memories</option>
             <option value="Four">Four</option>
             <option value="Made in the A.M.">Made in the A.M.</option>
         </select>
-        <br>
-        <button onclick="iniciarSorteio()">Girar Roleta!</button>
+        <button id="btnGirar" onclick="girarRoleta()">Recrutar Membro</button>
+        <button id="btnTurne" style="display: none; background-color: #2e7d32; border-color: #2e7d32;" onclick="alert('Sistema de shows em construção!')">Iniciar Turnê!</button>
     </div>
 
     <div class="card" id="resultCard">
-        <img src="" alt="Foto do Membro" class="member-photo" id="photoDisplay">
         <div class="member-name" id="nameDisplay">Membro</div>
         <div class="era" id="eraDisplay">Era</div>
         <div class="stats" id="statsDisplay"></div>
@@ -110,30 +107,22 @@
     </div>
 
     <script>
+        // Removi as fotos por enquanto para focar na mecânica.
         const membros = [
-            { nome: "Harry Styles", era: "Four", folego: 90, vocal: 95, carisma: 100, passiva: "🌟 Carta Lendária: Se a turnê falhar, o carisma ganha uma segunda chance.", foto: "https://i.pinimg.com/736x/88/5f/79/885f79a9cc2d56a73599e52c8b8686f3.jpg" },
-            { nome: "Zayn Malik", era: "Take Me Home", folego: 85, vocal: 100, carisma: 90, passiva: "🎤 High Note: Vence automaticamente desafios vocais.", foto: "https://i.pinimg.com/736x/21/cd/d8/21cdd8b8d96d9cf13c3cf6c827c1d3ec.jpg" },
-            { nome: "Niall Horan", era: "Midnight Memories", folego: 95, vocal: 80, carisma: 95, passiva: "🎸 Acústico: Aumenta a energia da banda tocando violão.", foto: "https://i.pinimg.com/736x/43/8b/63/438b630e6677f9e4eb57a7d0e82cc6fb.jpg" },
-            { nome: "Louis Tomlinson", era: "Up All Night", folego: 80, vocal: 85, carisma: 95, passiva: "🧭 Liderança: Impede perda de foco durante escândalos.", foto: "https://i.pinimg.com/736x/55/a3/94/55a394bb1082d6ba8e663a808dd44c35.jpg" },
-            { nome: "Liam Payne", era: "Made in the A.M.", folego: 100, vocal: 90, carisma: 85, passiva: "⚓ Sustentação: O pilar. Não perde fôlego fazendo três shows seguidos.", foto: "https://i.pinimg.com/736x/a2/82/32/a28232c1eb7042f9b2afcc6e8d120023.jpg" },
-            { nome: "Harry Styles", era: "Up All Night", folego: 80, vocal: 85, carisma: 90, passiva: "🎀 Gravata Borboleta: Charme extra no início da carreira.", foto: "https://i.pinimg.com/736x/91/9f/61/919f61b0c0340578672580aebf6f6b57.jpg" }
+            { nome: "Harry Styles", era: "Four", folego: 90, vocal: 95, carisma: 100, passiva: "Lendário: Carisma absurdo." },
+            { nome: "Zayn Malik", era: "Take Me Home", folego: 85, vocal: 100, carisma: 90, passiva: "High Note: Vence desafios vocais." },
+            { nome: "Niall Horan", era: "Midnight Memories", folego: 95, vocal: 80, carisma: 95, passiva: "Acústico: Recupera energia." },
+            { nome: "Louis Tomlinson", era: "Up All Night", folego: 80, vocal: 85, carisma: 95, passiva: "Liderança: Mantém o foco." },
+            { nome: "Liam Payne", era: "Made in the A.M.", folego: 100, vocal: 90, carisma: 85, passiva: "Sustentação: Não perde fôlego." },
+            { nome: "Harry Styles", era: "Up All Night", folego: 80, vocal: 85, carisma: 90, passiva: "Charme extra." }
         ];
 
-        let intervaloGiro; // Controla a animação
+        let equipe = [];
+        const MAX_EQUIPE = 5;
 
-        function atualizarCarta(membro) {
-            document.getElementById('photoDisplay').src = membro.foto;
-            document.getElementById('nameDisplay').innerText = membro.nome;
-            document.getElementById('eraDisplay').innerText = "Era: " + membro.era;
-            document.getElementById('statsDisplay').innerHTML = `
-                <p><strong>Fôlego:</strong> ${membro.folego}/100</p>
-                <p><strong>Vocal:</strong> ${membro.vocal}/100</p>
-                <p><strong>Carisma:</strong> ${membro.carisma}/100</p>
-            `;
-            document.getElementById('passivaDisplay').innerText = membro.passiva;
-        }
+        function girarRoleta() {
+            if (equipe.length >= MAX_EQUIPE) return;
 
-        function iniciarSorteio() {
             const filtro = document.getElementById('eraFilter').value;
             let membrosFiltrados = membros;
 
@@ -142,53 +131,53 @@
             }
 
             if (membrosFiltrados.length === 0) {
-                alert("Ainda não adicionamos cartas para a era " + filtro + "! Escolha outra.");
+                alert("Sem cartas para a era " + filtro + " ainda!");
                 return;
             }
 
-            const card = document.getElementById('resultCard');
-            const button = document.querySelector('button');
-            
-            // Prepara a tela para o giro
-            button.innerText = "Sorteando...";
-            button.disabled = true;
-            card.style.display = 'block'; // Mostra a carta
-            card.classList.add('spinning'); // Adiciona o efeito visual de tremer/borrar
+            // Sorteia instantaneamente (sem tremedeira)
+            const random = Math.floor(Math.random() * membrosFiltrados.length);
+            const sorteado = membrosFiltrados[random];
 
-            let tempo = 0;
-            const tempoMaximo = 2000; // O sorteio vai durar 2 segundos no total
-            
-            // Inicia o efeito de piscar os membros rapidamente (a cada 100 milissegundos)
-            intervaloGiro = setInterval(() => {
-                const random = Math.floor(Math.random() * membrosFiltrados.length);
-                atualizarCarta(membrosFiltrados[random]);
-                tempo += 100;
+            // Adiciona na equipe e atualiza a interface
+            equipe.push(sorteado);
+            atualizarSlot(equipe.length - 1, sorteado);
+            mostrarCarta(sorteado);
 
-                // Quando o tempo acabar, para a animação
-                if (tempo >= tempoMaximo) {
-                    clearInterval(intervaloGiro);
-                    finalizarSorteio(membrosFiltrados);
-                }
-            }, 100);
+            // Atualiza status do Draft
+            document.getElementById('statusDraft').innerText = `Gire a roleta para formar sua equipe (${equipe.length}/${MAX_EQUIPE} recrutados)`;
+
+            // Verifica se a equipe lotou
+            if (equipe.length === MAX_EQUIPE) {
+                document.getElementById('btnGirar').style.display = 'none';
+                document.getElementById('eraFilter').style.display = 'none';
+                document.getElementById('btnTurne').style.display = 'inline-block';
+            }
         }
 
-        function finalizarSorteio(listaFinal) {
+        function atualizarSlot(index, membro) {
+            const slot = document.getElementById(`slot-${index}`);
+            slot.classList.add('filled');
+            slot.innerHTML = `
+                <div class="slot-name">${membro.nome}</div>
+                <div style="font-size: 10px; color: #888;">${membro.era}</div>
+                <div class="slot-stats">
+                    F: ${membro.folego} | V: ${membro.vocal} | C: ${membro.carisma}
+                </div>
+            `;
+        }
+
+        function mostrarCarta(membro) {
             const card = document.getElementById('resultCard');
-            const button = document.querySelector('button');
-
-            // Remove o efeito visual de giro
-            card.classList.remove('spinning');
-
-            // Pega o sorteado definitivo
-            const randomFinal = Math.floor(Math.random() * listaFinal.length);
-            const sorteado = listaFinal[randomFinal];
-
-            // Atualiza a tela com o vencedor final
-            atualizarCarta(sorteado);
-
-            // Restaura o botão
-            button.innerText = "Girar Novamente!";
-            button.disabled = false;
+            document.getElementById('nameDisplay').innerText = membro.nome;
+            document.getElementById('eraDisplay').innerText = "Era: " + membro.era;
+            document.getElementById('statsDisplay').innerHTML = `
+                <p><strong>Fôlego:</strong> ${membro.folego}</p>
+                <p><strong>Vocal:</strong> ${membro.vocal}</p>
+                <p><strong>Carisma:</strong> ${membro.carisma}</p>
+            `;
+            document.getElementById('passivaDisplay').innerText = membro.passiva;
+            card.style.display = 'block';
         }
     </script>
 </body>
