@@ -15,7 +15,6 @@
         h1 { color: #d81b60; font-size: 2.5em; margin-bottom: 5px; }
         .subtitle { color: #888; margin-bottom: 20px; }
         
-        /* Estilo do Filtro */
         .controls { margin-bottom: 30px; }
         select {
             padding: 10px 15px;
@@ -38,17 +37,27 @@
             box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
             display: none; 
             border-top: 5px solid #d81b60;
-            animation: fadeIn 0.5s;
+            transition: transform 0.1s; /* Para o efeito de tremer */
         }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         
+        /* Classe adicionada durante o giro para dar emoção */
+        .spinning {
+            animation: shake 0.2s infinite;
+            filter: blur(1px);
+        }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            50% { transform: translate(-1px, -1px) rotate(-1deg); }
+            100% { transform: translate(1px, -2px) rotate(1deg); }
+        }
+
         .member-photo {
             width: 100%;
             height: 250px;
             object-fit: cover;
             border-radius: 10px;
             margin-bottom: 15px;
-            background-color: #f8bbd0; /* cor de fundo enquanto a foto não carrega */
+            background-color: #f8bbd0;
         }
 
         button { 
@@ -65,7 +74,8 @@
             margin-top: 10px;
         }
         button:hover { background-color: #ad1457; transform: scale(1.05); }
-        button:active { transform: scale(0.95); }
+        button:disabled { background-color: #f48fb1; cursor: not-allowed; transform: none; }
+        
         .member-name { font-size: 26px; font-weight: bold; color: #111; margin-bottom: 5px; }
         .era { font-style: italic; color: #d81b60; font-weight: bold; font-size: 14px; margin-bottom: 10px; }
         .stats { margin-top: 15px; font-size: 14px; text-align: left; background: #fdf0f4; padding: 10px; border-radius: 8px; }
@@ -88,12 +98,11 @@
             <option value="Made in the A.M.">Made in the A.M.</option>
         </select>
         <br>
-        <button onclick="girarRoleta()">Girar Roleta!</button>
+        <button onclick="iniciarSorteio()">Girar Roleta!</button>
     </div>
 
     <div class="card" id="resultCard">
         <img src="" alt="Foto do Membro" class="member-photo" id="photoDisplay">
-        
         <div class="member-name" id="nameDisplay">Membro</div>
         <div class="era" id="eraDisplay">Era</div>
         <div class="stats" id="statsDisplay"></div>
@@ -101,27 +110,37 @@
     </div>
 
     <script>
-        // Adicionei o campo "foto" com links temporários. Depois você pode trocar pelos links do Pinterest ou Google!
         const membros = [
             { nome: "Harry Styles", era: "Four", folego: 90, vocal: 95, carisma: 100, passiva: "🌟 Carta Lendária: Se a turnê falhar, o carisma ganha uma segunda chance.", foto: "https://i.pinimg.com/736x/88/5f/79/885f79a9cc2d56a73599e52c8b8686f3.jpg" },
             { nome: "Zayn Malik", era: "Take Me Home", folego: 85, vocal: 100, carisma: 90, passiva: "🎤 High Note: Vence automaticamente desafios vocais.", foto: "https://i.pinimg.com/736x/21/cd/d8/21cdd8b8d96d9cf13c3cf6c827c1d3ec.jpg" },
             { nome: "Niall Horan", era: "Midnight Memories", folego: 95, vocal: 80, carisma: 95, passiva: "🎸 Acústico: Aumenta a energia da banda tocando violão.", foto: "https://i.pinimg.com/736x/43/8b/63/438b630e6677f9e4eb57a7d0e82cc6fb.jpg" },
             { nome: "Louis Tomlinson", era: "Up All Night", folego: 80, vocal: 85, carisma: 95, passiva: "🧭 Liderança: Impede perda de foco durante escândalos.", foto: "https://i.pinimg.com/736x/55/a3/94/55a394bb1082d6ba8e663a808dd44c35.jpg" },
             { nome: "Liam Payne", era: "Made in the A.M.", folego: 100, vocal: 90, carisma: 85, passiva: "⚓ Sustentação: O pilar. Não perde fôlego fazendo três shows seguidos.", foto: "https://i.pinimg.com/736x/a2/82/32/a28232c1eb7042f9b2afcc6e8d120023.jpg" },
-            // Coloquei um Harry extra de outra era pra testar o filtro:
             { nome: "Harry Styles", era: "Up All Night", folego: 80, vocal: 85, carisma: 90, passiva: "🎀 Gravata Borboleta: Charme extra no início da carreira.", foto: "https://i.pinimg.com/736x/91/9f/61/919f61b0c0340578672580aebf6f6b57.jpg" }
         ];
 
-        function girarRoleta() {
+        let intervaloGiro; // Controla a animação
+
+        function atualizarCarta(membro) {
+            document.getElementById('photoDisplay').src = membro.foto;
+            document.getElementById('nameDisplay').innerText = membro.nome;
+            document.getElementById('eraDisplay').innerText = "Era: " + membro.era;
+            document.getElementById('statsDisplay').innerHTML = `
+                <p><strong>Fôlego:</strong> ${membro.folego}/100</p>
+                <p><strong>Vocal:</strong> ${membro.vocal}/100</p>
+                <p><strong>Carisma:</strong> ${membro.carisma}/100</p>
+            `;
+            document.getElementById('passivaDisplay').innerText = membro.passiva;
+        }
+
+        function iniciarSorteio() {
             const filtro = document.getElementById('eraFilter').value;
             let membrosFiltrados = membros;
 
-            // Filtra os membros se não for "Todas"
             if (filtro !== "Todas") {
                 membrosFiltrados = membros.filter(m => m.era === filtro);
             }
 
-            // Se o filtro não tiver ninguém cadastrado ainda
             if (membrosFiltrados.length === 0) {
                 alert("Ainda não adicionamos cartas para a era " + filtro + "! Escolha outra.");
                 return;
@@ -130,29 +149,46 @@
             const card = document.getElementById('resultCard');
             const button = document.querySelector('button');
             
-            card.style.display = 'none'; 
+            // Prepara a tela para o giro
             button.innerText = "Sorteando...";
             button.disabled = true;
+            card.style.display = 'block'; // Mostra a carta
+            card.classList.add('spinning'); // Adiciona o efeito visual de tremer/borrar
 
-            setTimeout(() => {
+            let tempo = 0;
+            const tempoMaximo = 2000; // O sorteio vai durar 2 segundos no total
+            
+            // Inicia o efeito de piscar os membros rapidamente (a cada 100 milissegundos)
+            intervaloGiro = setInterval(() => {
                 const random = Math.floor(Math.random() * membrosFiltrados.length);
-                const sorteado = membrosFiltrados[random];
+                atualizarCarta(membrosFiltrados[random]);
+                tempo += 100;
 
-                // Atualizando a tela com os dados e a foto
-                document.getElementById('photoDisplay').src = sorteado.foto;
-                document.getElementById('nameDisplay').innerText = sorteado.nome;
-                document.getElementById('eraDisplay').innerText = "Era: " + sorteado.era;
-                document.getElementById('statsDisplay').innerHTML = `
-                    <p><strong>Fôlego:</strong> ${sorteado.folego}/100</p>
-                    <p><strong>Vocal:</strong> ${sorteado.vocal}/100</p>
-                    <p><strong>Carisma:</strong> ${sorteado.carisma}/100</p>
-                `;
-                document.getElementById('passivaDisplay').innerText = sorteado.passiva;
-                
-                card.style.display = 'block';
-                button.innerText = "Girar Novamente!";
-                button.disabled = false;
-            }, 600);
+                // Quando o tempo acabar, para a animação
+                if (tempo >= tempoMaximo) {
+                    clearInterval(intervaloGiro);
+                    finalizarSorteio(membrosFiltrados);
+                }
+            }, 100);
+        }
+
+        function finalizarSorteio(listaFinal) {
+            const card = document.getElementById('resultCard');
+            const button = document.querySelector('button');
+
+            // Remove o efeito visual de giro
+            card.classList.remove('spinning');
+
+            // Pega o sorteado definitivo
+            const randomFinal = Math.floor(Math.random() * listaFinal.length);
+            const sorteado = listaFinal[randomFinal];
+
+            // Atualiza a tela com o vencedor final
+            atualizarCarta(sorteado);
+
+            // Restaura o botão
+            button.innerText = "Girar Novamente!";
+            button.disabled = false;
         }
     </script>
 </body>
