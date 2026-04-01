@@ -7,25 +7,50 @@
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #fce4ec; /* Um tom suave de rosa/vermelho */
+            background-color: #fce4ec; 
             color: #333; 
             text-align: center; 
             padding: 20px; 
         }
         h1 { color: #d81b60; font-size: 2.5em; margin-bottom: 5px; }
-        .subtitle { color: #888; margin-bottom: 30px; }
+        .subtitle { color: #888; margin-bottom: 20px; }
+        
+        /* Estilo do Filtro */
+        .controls { margin-bottom: 30px; }
+        select {
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: 2px solid #d81b60;
+            background: white;
+            color: #d81b60;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+        }
+
         .card { 
             background: white; 
             border-radius: 15px; 
-            padding: 30px; 
+            padding: 20px; 
             margin: 20px auto; 
-            max-width: 350px; 
+            max-width: 300px; 
             box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
             display: none; 
             border-top: 5px solid #d81b60;
             animation: fadeIn 0.5s;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .member-photo {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background-color: #f8bbd0; /* cor de fundo enquanto a foto não carrega */
+        }
+
         button { 
             background-color: #d81b60; 
             color: white; 
@@ -37,12 +62,13 @@
             cursor: pointer; 
             box-shadow: 0 4px 6px rgba(216, 27, 96, 0.3);
             transition: all 0.2s; 
+            margin-top: 10px;
         }
         button:hover { background-color: #ad1457; transform: scale(1.05); }
         button:active { transform: scale(0.95); }
-        .member-name { font-size: 28px; font-weight: bold; color: #111; margin-bottom: 5px; }
-        .era { font-style: italic; color: #d81b60; font-weight: bold; font-size: 16px; margin-bottom: 15px; }
-        .stats { margin-top: 15px; font-size: 15px; text-align: left; background: #fdf0f4; padding: 15px; border-radius: 8px; }
+        .member-name { font-size: 26px; font-weight: bold; color: #111; margin-bottom: 5px; }
+        .era { font-style: italic; color: #d81b60; font-weight: bold; font-size: 14px; margin-bottom: 10px; }
+        .stats { margin-top: 15px; font-size: 14px; text-align: left; background: #fdf0f4; padding: 10px; border-radius: 8px; }
         .stats p { margin: 5px 0; border-bottom: 1px solid #f8bbd0; padding-bottom: 5px; }
         .stats p:last-child { border-bottom: none; }
         .passiva { margin-top: 15px; font-size: 13px; color: #555; font-style: italic; text-align: center;}
@@ -50,11 +76,24 @@
 </head>
 <body>
     <h1>🎤 1D Roulette</h1>
-    <p class="subtitle">Prepare-se para a Turnê Mundial. Gire a roleta e monte sua equipe!</p>
+    <p class="subtitle">Prepare-se para a Turnê Mundial. Filtre o álbum e monte sua equipe!</p>
 
-    <button onclick="girarRoleta()">Girar Roleta!</button>
+    <div class="controls">
+        <select id="eraFilter">
+            <option value="Todas">Todas as Eras (Aleatório)</option>
+            <option value="Up All Night">Up All Night</option>
+            <option value="Take Me Home">Take Me Home</option>
+            <option value="Midnight Memories">Midnight Memories</option>
+            <option value="Four">Four</option>
+            <option value="Made in the A.M.">Made in the A.M.</option>
+        </select>
+        <br>
+        <button onclick="girarRoleta()">Girar Roleta!</button>
+    </div>
 
     <div class="card" id="resultCard">
+        <img src="" alt="Foto do Membro" class="member-photo" id="photoDisplay">
+        
         <div class="member-name" id="nameDisplay">Membro</div>
         <div class="era" id="eraDisplay">Era</div>
         <div class="stats" id="statsDisplay"></div>
@@ -62,28 +101,45 @@
     </div>
 
     <script>
-        // Nosso "Banco de Dados" do One Direction
+        // Adicionei o campo "foto" com links temporários. Depois você pode trocar pelos links do Pinterest ou Google!
         const membros = [
-            { nome: "Harry Styles", era: "Four", folego: 90, vocal: 95, carisma: 100, passiva: "🌟 Carta Lendária: Se a turnê falhar, o carisma absurdo do Harry ganha uma segunda chance com o público." },
-            { nome: "Zayn Malik", era: "Take Me Home", folego: 85, vocal: 100, carisma: 90, passiva: "🎤 High Note: Vence automaticamente qualquer desafio vocal em shows de estádio." },
-            { nome: "Niall Horan", era: "Midnight Memories", folego: 95, vocal: 80, carisma: 95, passiva: "🎸 Acústico: Aumenta a barra de energia de toda a banda ao tocar violão nos bastidores." },
-            { nome: "Louis Tomlinson", era: "Up All Night", folego: 80, vocal: 85, carisma: 95, passiva: "🧭 Liderança: Impede que a banda perca foco durante escândalos de paparazzi." },
-            { nome: "Liam Payne", era: "Made in the A.M.", folego: 100, vocal: 90, carisma: 85, passiva: "⚓ Sustentação: O pilar do grupo. Não perde fôlego mesmo fazendo três shows seguidos." }
+            { nome: "Harry Styles", era: "Four", folego: 90, vocal: 95, carisma: 100, passiva: "🌟 Carta Lendária: Se a turnê falhar, o carisma ganha uma segunda chance.", foto: "https://i.pinimg.com/736x/88/5f/79/885f79a9cc2d56a73599e52c8b8686f3.jpg" },
+            { nome: "Zayn Malik", era: "Take Me Home", folego: 85, vocal: 100, carisma: 90, passiva: "🎤 High Note: Vence automaticamente desafios vocais.", foto: "https://i.pinimg.com/736x/21/cd/d8/21cdd8b8d96d9cf13c3cf6c827c1d3ec.jpg" },
+            { nome: "Niall Horan", era: "Midnight Memories", folego: 95, vocal: 80, carisma: 95, passiva: "🎸 Acústico: Aumenta a energia da banda tocando violão.", foto: "https://i.pinimg.com/736x/43/8b/63/438b630e6677f9e4eb57a7d0e82cc6fb.jpg" },
+            { nome: "Louis Tomlinson", era: "Up All Night", folego: 80, vocal: 85, carisma: 95, passiva: "🧭 Liderança: Impede perda de foco durante escândalos.", foto: "https://i.pinimg.com/736x/55/a3/94/55a394bb1082d6ba8e663a808dd44c35.jpg" },
+            { nome: "Liam Payne", era: "Made in the A.M.", folego: 100, vocal: 90, carisma: 85, passiva: "⚓ Sustentação: O pilar. Não perde fôlego fazendo três shows seguidos.", foto: "https://i.pinimg.com/736x/a2/82/32/a28232c1eb7042f9b2afcc6e8d120023.jpg" },
+            // Coloquei um Harry extra de outra era pra testar o filtro:
+            { nome: "Harry Styles", era: "Up All Night", folego: 80, vocal: 85, carisma: 90, passiva: "🎀 Gravata Borboleta: Charme extra no início da carreira.", foto: "https://i.pinimg.com/736x/91/9f/61/919f61b0c0340578672580aebf6f6b57.jpg" }
         ];
 
         function girarRoleta() {
+            const filtro = document.getElementById('eraFilter').value;
+            let membrosFiltrados = membros;
+
+            // Filtra os membros se não for "Todas"
+            if (filtro !== "Todas") {
+                membrosFiltrados = membros.filter(m => m.era === filtro);
+            }
+
+            // Se o filtro não tiver ninguém cadastrado ainda
+            if (membrosFiltrados.length === 0) {
+                alert("Ainda não adicionamos cartas para a era " + filtro + "! Escolha outra.");
+                return;
+            }
+
             const card = document.getElementById('resultCard');
             const button = document.querySelector('button');
             
-            card.style.display = 'none'; // Esconde a carta
+            card.style.display = 'none'; 
             button.innerText = "Sorteando...";
             button.disabled = true;
 
-            // Efeito de suspense
             setTimeout(() => {
-                const random = Math.floor(Math.random() * membros.length);
-                const sorteado = membros[random];
+                const random = Math.floor(Math.random() * membrosFiltrados.length);
+                const sorteado = membrosFiltrados[random];
 
+                // Atualizando a tela com os dados e a foto
+                document.getElementById('photoDisplay').src = sorteado.foto;
                 document.getElementById('nameDisplay').innerText = sorteado.nome;
                 document.getElementById('eraDisplay').innerText = "Era: " + sorteado.era;
                 document.getElementById('statsDisplay').innerHTML = `
