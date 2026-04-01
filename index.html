@@ -3,151 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1D Roulette - Draft da Turnê</title>
+    <title>1D Roulette - Turnê Mundial</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: #fce4ec; 
-            color: #333; 
-            text-align: center; 
-            padding: 20px; 
-        }
-        h1 { color: #d81b60; font-size: 2.5em; margin-bottom: 5px; }
-        .subtitle { color: #888; margin-bottom: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #fce4ec; color: #333; text-align: center; padding: 20px; }
+        h1 { color: #d81b60; font-size: 2.2em; margin-bottom: 5px; }
+        .subtitle { color: #888; margin-bottom: 20px; font-size: 14px;}
         
-        .controls { margin-bottom: 20px; }
-        select, button {
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 10px;
-            border: 2px solid #d81b60;
-            font-weight: bold;
-            cursor: pointer;
-            margin: 5px;
-        }
-        select { background: white; color: #d81b60; outline: none; }
-        button { background-color: #d81b60; color: white; transition: 0.2s; }
+        button { padding: 10px 15px; font-size: 16px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin: 5px; background-color: #d81b60; color: white; transition: 0.2s; box-shadow: 0 4px 6px rgba(216, 27, 96, 0.3);}
         button:hover:not(:disabled) { background-color: #ad1457; transform: scale(1.05); }
-        button:disabled { background-color: #f8bbd0; border-color: #f8bbd0; cursor: not-allowed; transform: none; }
+        button:disabled { background-color: #f8bbd0; cursor: not-allowed; transform: none; box-shadow: none;}
+        select { padding: 10px; border-radius: 10px; border: 2px solid #d81b60; color: #d81b60; font-weight: bold; outline: none; }
 
-        /* Estilo da Equipe Formada (Os 5 Slots) */
-        .team-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        .slot {
-            width: 120px;
-            height: 150px;
-            background: #fff;
-            border: 2px dashed #d81b60;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            padding: 5px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .slot.filled { border-style: solid; background: #fdf0f4; }
-        .slot-name { font-weight: bold; color: #d81b60; margin-bottom: 5px; text-align: center; }
-        .slot-stats { font-size: 11px; text-align: left; width: 100%; }
+        /* TELA DE DRAFT */
+        #draftScreen { display: block; }
+        .team-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .slot { width: 100px; height: 130px; background: #fff; border: 2px dashed #d81b60; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; padding: 5px; }
+        .slot.filled { border-style: solid; background: #fdf0f4; border-color: #d81b60; cursor: pointer; transition: 0.2s;}
+        .slot.filled:hover { transform: translateY(-5px); box-shadow: 0 5px 10px rgba(216, 27, 96, 0.2); }
+        .slot-name { font-weight: bold; color: #d81b60; margin-bottom: 2px; font-size: 14px; text-align: center; }
+        .slot-stats { font-size: 10px; text-align: left; width: 100%; margin-top: 5px; }
 
-        /* A Carta do Sorteio Atual */
-        .card { 
-            background: white; 
-            border-radius: 15px; 
-            padding: 20px; 
-            margin: 20px auto; 
-            max-width: 300px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
-            display: none; 
-            border-top: 5px solid #d81b60;
-        }
+        .card { background: white; border-radius: 15px; padding: 15px; margin: 10px auto; max-width: 250px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; border-top: 5px solid #d81b60; }
+        .member-name { font-size: 20px; font-weight: bold; color: #111; }
+        .era { font-style: italic; color: #d81b60; font-size: 12px; margin-bottom: 5px; }
+        .stats { margin-top: 10px; font-size: 13px; text-align: left; background: #fdf0f4; padding: 8px; border-radius: 8px; }
+
+        /* TELA DA TURNÊ (Invisível no início) */
+        #tourScreen { display: none; }
+        .status-bar { background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; justify-content: space-around; font-weight: bold; font-size: 18px;}
+        .hype { color: #2e7d32; }
+        .stage { color: #1565c0; }
+
+        .event-box { background: #fff; border: 3px solid #ff9800; border-radius: 15px; padding: 25px; margin: 20px auto; max-width: 400px; box-shadow: 0 10px 20px rgba(255, 152, 0, 0.2); }
+        .event-title { font-size: 22px; font-weight: bold; color: #ff9800; margin-bottom: 10px; }
+        .event-desc { font-size: 16px; margin-bottom: 15px; }
+        .event-req { font-size: 18px; font-weight: bold; color: #d32f2f; background: #ffebee; padding: 10px; border-radius: 8px; display: inline-block;}
         
-        .member-name { font-size: 24px; font-weight: bold; color: #111; margin-bottom: 5px; }
-        .era { font-style: italic; color: #d81b60; font-weight: bold; font-size: 14px; margin-bottom: 10px; }
-        .stats { margin-top: 15px; font-size: 14px; text-align: left; background: #fdf0f4; padding: 10px; border-radius: 8px; }
-        .passiva { margin-top: 15px; font-size: 12px; color: #555; font-style: italic; text-align: center;}
+        .action-text { margin-top: 20px; font-weight: bold; color: #555; font-size: 14px;}
     </style>
 </head>
 <body>
-    <h1>🎤 1D Roulette: O Draft</h1>
-    <p class="subtitle" id="statusDraft">Gire a roleta para formar sua equipe (0/5 recrutados)</p>
 
-    <div class="team-container" id="teamSlots">
-        <div class="slot" id="slot-0">Vazio</div>
-        <div class="slot" id="slot-1">Vazio</div>
-        <div class="slot" id="slot-2">Vazio</div>
-        <div class="slot" id="slot-3">Vazio</div>
-        <div class="slot" id="slot-4">Vazio</div>
+    <div id="draftScreen">
+        <h1>🎤 1D Roulette: Draft</h1>
+        <p class="subtitle" id="statusDraft">Gire a roleta para formar sua banda (0/5 recrutados)</p>
+
+        <div class="team-container" id="teamSlotsDraft">
+            <div class="slot" id="slot-0">Vazio</div>
+            <div class="slot" id="slot-1">Vazio</div>
+            <div class="slot" id="slot-2">Vazio</div>
+            <div class="slot" id="slot-3">Vazio</div>
+            <div class="slot" id="slot-4">Vazio</div>
+        </div>
+
+        <div>
+            <select id="eraFilter">
+                <option value="Todas">Todas as Eras</option>
+                <option value="Up All Night">Up All Night</option>
+                <option value="Take Me Home">Take Me Home</option>
+                <option value="Midnight Memories">Midnight Memories</option>
+                <option value="Four">Four</option>
+                <option value="Made in the A.M.">Made in the A.M.</option>
+            </select>
+            <button id="btnGirar" onclick="girarRoleta()">Recrutar Membro</button>
+            <button id="btnTurne" style="display: none; background-color: #2e7d32;" onclick="iniciarTurne()">Iniciar Turnê Mundial!</button>
+        </div>
+
+        <div class="card" id="resultCard">
+            <div class="member-name" id="nameDisplay">Membro</div>
+            <div class="era" id="eraDisplay">Era</div>
+            <div class="stats" id="statsDisplay"></div>
+        </div>
     </div>
 
-    <div class="controls">
-        <select id="eraFilter">
-            <option value="Todas">Todas as Eras</option>
-            <option value="Up All Night">Up All Night</option>
-            <option value="Take Me Home">Take Me Home</option>
-            <option value="Midnight Memories">Midnight Memories</option>
-            <option value="Four">Four</option>
-            <option value="Made in the A.M.">Made in the A.M.</option>
-        </select>
-        <button id="btnGirar" onclick="girarRoleta()">Recrutar Membro</button>
-        <button id="btnTurne" style="display: none; background-color: #2e7d32; border-color: #2e7d32;" onclick="alert('Sistema de shows em construção!')">Iniciar Turnê!</button>
-    </div>
+    <div id="tourScreen">
+        <h1>🌍 World Tour</h1>
+        
+        <div class="status-bar">
+            <div class="stage" id="showCounter">Show: 1/10</div>
+            <div class="hype" id="hypeCounter">Hype da Banda: 100%</div>
+        </div>
 
-    <div class="card" id="resultCard">
-        <div class="member-name" id="nameDisplay">Membro</div>
-        <div class="era" id="eraDisplay">Era</div>
-        <div class="stats" id="statsDisplay"></div>
-        <div class="passiva" id="passivaDisplay"></div>
+        <div class="event-box">
+            <div class="event-title" id="eventTitle">Chegando na Arena...</div>
+            <div class="event-desc" id="eventDesc">A multidão está gritando. O que vai acontecer esta noite?</div>
+            <div class="event-req" id="eventReq">Desafio: ???</div>
+        </div>
+
+        <p class="action-text">Clique em um membro da sua equipe abaixo para enfrentar o desafio:</p>
+        
+        <div class="team-container" id="teamSlotsTour">
+            </div>
     </div>
 
     <script>
-        // Removi as fotos por enquanto para focar na mecânica.
         const membros = [
-            { nome: "Harry Styles", era: "Four", folego: 90, vocal: 95, carisma: 100, passiva: "Lendário: Carisma absurdo." },
-            { nome: "Zayn Malik", era: "Take Me Home", folego: 85, vocal: 100, carisma: 90, passiva: "High Note: Vence desafios vocais." },
-            { nome: "Niall Horan", era: "Midnight Memories", folego: 95, vocal: 80, carisma: 95, passiva: "Acústico: Recupera energia." },
-            { nome: "Louis Tomlinson", era: "Up All Night", folego: 80, vocal: 85, carisma: 95, passiva: "Liderança: Mantém o foco." },
-            { nome: "Liam Payne", era: "Made in the A.M.", folego: 100, vocal: 90, carisma: 85, passiva: "Sustentação: Não perde fôlego." },
-            { nome: "Harry Styles", era: "Up All Night", folego: 80, vocal: 85, carisma: 90, passiva: "Charme extra." }
+            { id: 1, nome: "Harry Styles", era: "Four", folego: 85, vocal: 90, carisma: 100 },
+            { id: 2, nome: "Zayn Malik", era: "Take Me Home", folego: 80, vocal: 100, carisma: 85 },
+            { id: 3, nome: "Niall Horan", era: "Midnight Memories", folego: 95, vocal: 80, carisma: 90 },
+            { id: 4, nome: "Louis Tomlinson", era: "Up All Night", folego: 85, vocal: 85, carisma: 95 },
+            { id: 5, nome: "Liam Payne", era: "Made in the A.M.", folego: 100, vocal: 90, carisma: 80 },
+            { id: 6, nome: "Harry Styles", era: "Up All Night", folego: 80, vocal: 85, carisma: 90 }
         ];
 
         let equipe = [];
         const MAX_EQUIPE = 5;
+        let hypeBanda = 100;
+        let showAtual = 1;
+        const TOTAL_SHOWS = 10;
 
+        // Lógica do Draft
         function girarRoleta() {
             if (equipe.length >= MAX_EQUIPE) return;
 
             const filtro = document.getElementById('eraFilter').value;
-            let membrosFiltrados = membros;
+            let filtrados = filtro !== "Todas" ? membros.filter(m => m.era === filtro) : membros;
 
-            if (filtro !== "Todas") {
-                membrosFiltrados = membros.filter(m => m.era === filtro);
-            }
+            if (filtrados.length === 0) { alert("Sem cartas!"); return; }
 
-            if (membrosFiltrados.length === 0) {
-                alert("Sem cartas para a era " + filtro + " ainda!");
-                return;
-            }
-
-            // Sorteia instantaneamente (sem tremedeira)
-            const random = Math.floor(Math.random() * membrosFiltrados.length);
-            const sorteado = membrosFiltrados[random];
-
-            // Adiciona na equipe e atualiza a interface
+            const sorteado = filtrados[Math.floor(Math.random() * filtrados.length)];
             equipe.push(sorteado);
-            atualizarSlot(equipe.length - 1, sorteado);
+            
+            atualizarSlotDraft(equipe.length - 1, sorteado);
             mostrarCarta(sorteado);
 
-            // Atualiza status do Draft
-            document.getElementById('statusDraft').innerText = `Gire a roleta para formar sua equipe (${equipe.length}/${MAX_EQUIPE} recrutados)`;
+            document.getElementById('statusDraft').innerText = `Equipe (${equipe.length}/${MAX_EQUIPE})`;
 
-            // Verifica se a equipe lotou
             if (equipe.length === MAX_EQUIPE) {
                 document.getElementById('btnGirar').style.display = 'none';
                 document.getElementById('eraFilter').style.display = 'none';
@@ -155,29 +136,93 @@
             }
         }
 
-        function atualizarSlot(index, membro) {
+        function atualizarSlotDraft(index, membro) {
             const slot = document.getElementById(`slot-${index}`);
             slot.classList.add('filled');
-            slot.innerHTML = `
-                <div class="slot-name">${membro.nome}</div>
-                <div style="font-size: 10px; color: #888;">${membro.era}</div>
-                <div class="slot-stats">
-                    F: ${membro.folego} | V: ${membro.vocal} | C: ${membro.carisma}
-                </div>
-            `;
+            slot.innerHTML = `<div class="slot-name">${membro.nome}</div><div style="font-size: 9px; color: #888;">${membro.era}</div><div class="slot-stats">F:${membro.folego} | V:${membro.vocal} | C:${membro.carisma}</div>`;
         }
 
         function mostrarCarta(membro) {
             const card = document.getElementById('resultCard');
             document.getElementById('nameDisplay').innerText = membro.nome;
-            document.getElementById('eraDisplay').innerText = "Era: " + membro.era;
-            document.getElementById('statsDisplay').innerHTML = `
-                <p><strong>Fôlego:</strong> ${membro.folego}</p>
-                <p><strong>Vocal:</strong> ${membro.vocal}</p>
-                <p><strong>Carisma:</strong> ${membro.carisma}</p>
-            `;
-            document.getElementById('passivaDisplay').innerText = membro.passiva;
+            document.getElementById('eraDisplay').innerText = membro.era;
+            document.getElementById('statsDisplay').innerHTML = `Fôlego: ${membro.folego} | Vocal: ${membro.vocal} | Carisma: ${membro.carisma}`;
             card.style.display = 'block';
+        }
+
+        // Transição para a Turnê
+        function iniciarTurne() {
+            document.getElementById('draftScreen').style.display = 'none';
+            document.getElementById('tourScreen').style.display = 'block';
+            
+            // Copia os membros sorteados para os botões clicáveis da tela de turnê
+            const containerTour = document.getElementById('teamSlotsTour');
+            equipe.forEach((membro, index) => {
+                containerTour.innerHTML += `
+                    <div class="slot filled" onclick="enfrentarDesafio(${index})">
+                        <div class="slot-name">${membro.nome}</div>
+                        <div style="font-size: 9px; color: #888;">${membro.era}</div>
+                        <div class="slot-stats">F:${membro.folego} | V:${membro.vocal} | C:${membro.carisma}</div>
+                    </div>
+                `;
+            });
+
+            gerarNovoShow();
+        }
+
+        // Sistema de Batalha (Mecânica Central)
+        let desafioAtual = {};
+
+        function gerarNovoShow() {
+            // Um banco de dados rápido de problemas que podem acontecer num show
+            const eventos = [
+                { titulo: "Solo de Alta Frequência", desc: "O microfone principal falhou! Alguém precisa projetar a voz na raça.", atributo: "vocal", valor: 90 },
+                { titulo: "Paparazzi no Hotel", desc: "Tumulto na saída do hotel atrasou o grupo. Alguém precisa acalmar as fãs na porta.", atributo: "carisma", valor: 95 },
+                { titulo: "Show de 3 Horas", desc: "A setlist foi estendida hoje e está muito calor. Quem aguenta pular no palco?", atributo: "folego", valor: 90 },
+                { titulo: "Acordes Errados", desc: "A banda de apoio errou o tempo. Alguém precisa improvisar e encantar o público.", atributo: "carisma", valor: 90 },
+                { titulo: "High Note no Wembley", desc: "Chegou a hora da nota mais alta de 'You & I'. É agora ou nunca.", atributo: "vocal", valor: 95 }
+            ];
+
+            desafioAtual = eventos[Math.floor(Math.random() * eventos.length)];
+            
+            document.getElementById('eventTitle').innerText = desafioAtual.titulo;
+            document.getElementById('eventDesc').innerText = desafioAtual.desc;
+            
+            // Traduz a exigência para a tela
+            let nomeAtributo = desafioAtual.atributo === "vocal" ? "Vocal" : desafioAtual.atributo === "folego" ? "Fôlego" : "Carisma";
+            document.getElementById('eventReq').innerText = `Exige: ${desafioAtual.valor} de ${nomeAtributo}`;
+        }
+
+        function enfrentarDesafio(indexMembro) {
+            const membroEscolhido = equipe[indexMembro];
+            const valorMembro = membroEscolhido[desafioAtual.atributo]; // Pega o atributo específico (ex: vocal) do membro
+
+            if (valorMembro >= desafioAtual.valor) {
+                // SUCESSO!
+                alert(`✨ SUCESSO! ${membroEscolhido.nome} mandou muito bem! A multidão foi à loucura.`);
+            } else {
+                // FALHA!
+                alert(`❌ FALHA! ${membroEscolhido.nome} não aguentou a pressão (Tinha ${valorMembro}, precisava de ${desafioAtual.valor}). A banda perdeu 20% de Hype.`);
+                hypeBanda -= 20;
+                document.getElementById('hypeCounter').innerText = `Hype da Banda: ${hypeBanda}%`;
+            }
+
+            // Verifica Game Over
+            if (hypeBanda <= 0) {
+                alert("💔 GAME OVER! A turnê foi cancelada. O Hype chegou a zero.");
+                location.reload(); // Recarrega a página para reiniciar
+                return;
+            }
+
+            // Avança para o próximo show
+            showAtual++;
+            if (showAtual > TOTAL_SHOWS) {
+                alert("🏆 VOCÊ VENCEU! A Turnê Mundial foi um sucesso absoluto!");
+                location.reload();
+            } else {
+                document.getElementById('showCounter').innerText = `Show: ${showAtual}/${TOTAL_SHOWS}`;
+                gerarNovoShow();
+            }
         }
     </script>
 </body>
