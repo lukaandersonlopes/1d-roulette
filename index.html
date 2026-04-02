@@ -3,225 +3,243 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>1D Roulette - Turnê Mundial</title>
+    <title>1D Roulette: A Turnê do Destino</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #fce4ec; color: #333; text-align: center; padding: 20px; }
-        h1 { color: #d81b60; font-size: 2.2em; margin-bottom: 5px; }
-        .subtitle { color: #888; margin-bottom: 20px; font-size: 14px;}
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #1a1a1a; color: #fff; text-align: center; padding: 20px; }
+        h1 { color: #ff4081; font-size: 2.5em; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px;}
+        .subtitle { color: #aaa; margin-bottom: 20px; font-size: 14px;}
         
-        button { padding: 10px 15px; font-size: 16px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; margin: 5px; background-color: #d81b60; color: white; transition: 0.2s; box-shadow: 0 4px 6px rgba(216, 27, 96, 0.3);}
-        button:hover:not(:disabled) { background-color: #ad1457; transform: scale(1.05); }
-        button:disabled { background-color: #f8bbd0; cursor: not-allowed; transform: none; box-shadow: none;}
-        select { padding: 10px; border-radius: 10px; border: 2px solid #d81b60; color: #d81b60; font-weight: bold; outline: none; }
+        /* Barra de Status */
+        .status-board { display: flex; justify-content: center; gap: 30px; background: #333; padding: 15px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); font-size: 20px; font-weight: bold;}
+        .status-shows { color: #00e5ff; }
+        .status-hype { color: #69f0ae; }
 
-        /* TELA DE DRAFT */
-        #draftScreen { display: block; }
-        .team-container { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .slot { width: 100px; height: 130px; background: #fff; border: 2px dashed #d81b60; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; padding: 5px; }
-        .slot.filled { border-style: solid; background: #fdf0f4; border-color: #d81b60; cursor: pointer; transition: 0.2s;}
-        .slot.filled:hover { transform: translateY(-5px); box-shadow: 0 5px 10px rgba(216, 27, 96, 0.2); }
-        .slot-name { font-weight: bold; color: #d81b60; margin-bottom: 2px; font-size: 14px; text-align: center; }
-        .slot-stats { font-size: 10px; text-align: left; width: 100%; margin-top: 5px; }
-
-        .card { background: white; border-radius: 15px; padding: 15px; margin: 10px auto; max-width: 250px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; border-top: 5px solid #d81b60; }
-        .member-name { font-size: 20px; font-weight: bold; color: #111; }
-        .era { font-style: italic; color: #d81b60; font-size: 12px; margin-bottom: 5px; }
-        .stats { margin-top: 10px; font-size: 13px; text-align: left; background: #fdf0f4; padding: 8px; border-radius: 8px; }
-
-        /* TELA DA TURNÊ (Invisível no início) */
-        #tourScreen { display: none; }
-        .status-bar { background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); display: flex; justify-content: space-around; font-weight: bold; font-size: 18px;}
-        .hype { color: #2e7d32; }
-        .stage { color: #1565c0; }
-
-        .event-box { background: #fff; border: 3px solid #ff9800; border-radius: 15px; padding: 25px; margin: 20px auto; max-width: 400px; box-shadow: 0 10px 20px rgba(255, 152, 0, 0.2); }
-        .event-title { font-size: 22px; font-weight: bold; color: #ff9800; margin-bottom: 10px; }
-        .event-desc { font-size: 16px; margin-bottom: 15px; }
-        .event-req { font-size: 18px; font-weight: bold; color: #d32f2f; background: #ffebee; padding: 10px; border-radius: 8px; display: inline-block;}
+        /* A Roleta Principal */
+        .roulette-container { background: #222; border: 4px solid #ff4081; border-radius: 20px; padding: 30px; max-width: 400px; margin: 0 auto 30px auto; box-shadow: 0 0 20px rgba(255, 64, 129, 0.4); }
+        .roulette-screen { background: #111; border-radius: 10px; padding: 40px 20px; font-size: 28px; font-weight: bold; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 20px; border: 2px inset #555; }
         
-        .action-text { margin-top: 20px; font-weight: bold; color: #555; font-size: 14px;}
+        .result-title { font-size: 32px; margin-bottom: 10px; }
+        .result-desc { font-size: 16px; color: #ccc; font-weight: normal; }
+
+        button { background-color: #ff4081; color: white; border: none; padding: 15px 30px; font-size: 22px; font-weight: bold; border-radius: 50px; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 0 #c51162; text-transform: uppercase;}
+        button:hover:not(:disabled) { background-color: #f50057; transform: translateY(2px); box-shadow: 0 3px 0 #c51162; }
+        button:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 0 0 #c51162; }
+        button:disabled { background-color: #555; box-shadow: 0 5px 0 #333; cursor: not-allowed; color: #888;}
+
+        /* Equipe Recrutada */
+        h2 { color: #00e5ff; margin-top: 40px; }
+        .team-container { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 30px; }
+        .slot { width: 110px; height: 140px; background: #333; border: 2px solid #555; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; text-align: center; transition: 0.3s;}
+        .slot.member { border-color: #ff4081; background: #2a0a18; }
+        .slot-icon { font-size: 40px; margin-bottom: 10px; }
+        .slot-name { font-weight: bold; font-size: 14px; color: #fff; }
+        .slot-role { font-size: 11px; color: #aaa; margin-top: 5px; }
+
+        /* Animação do Sorteio */
+        .spinning { animation: pulse 0.1s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.02); opacity: 1; } }
+
+        /* Cores dos Resultados */
+        .color-show { color: #00e5ff; }
+        .color-bad { color: #ff5252; }
+        .color-item { color: #ffd740; }
+        .color-recruit { color: #b388ff; }
     </style>
 </head>
 <body>
 
-    <div id="draftScreen">
-        <h1>🎤 1D Roulette: Draft</h1>
-        <p class="subtitle" id="statusDraft">Gire a roleta para formar sua banda (0/5 recrutados)</p>
+    <h1>🎰 1D Roulette</h1>
+    <p class="subtitle">Gire a Roleta do Destino. Sobreviva a 10 shows sem o Hype chegar a zero!</p>
 
-        <div class="team-container" id="teamSlotsDraft">
-            <div class="slot" id="slot-0">Vazio</div>
-            <div class="slot" id="slot-1">Vazio</div>
-            <div class="slot" id="slot-2">Vazio</div>
-            <div class="slot" id="slot-3">Vazio</div>
-            <div class="slot" id="slot-4">Vazio</div>
-        </div>
-
-        <div>
-            <select id="eraFilter">
-                <option value="Todas">Todas as Eras</option>
-                <option value="Up All Night">Up All Night</option>
-                <option value="Take Me Home">Take Me Home</option>
-                <option value="Midnight Memories">Midnight Memories</option>
-                <option value="Four">Four</option>
-                <option value="Made in the A.M.">Made in the A.M.</option>
-            </select>
-            <button id="btnGirar" onclick="girarRoleta()">Recrutar Membro</button>
-            <button id="btnTurne" style="display: none; background-color: #2e7d32;" onclick="iniciarTurne()">Iniciar Turnê Mundial!</button>
-        </div>
-
-        <div class="card" id="resultCard">
-            <div class="member-name" id="nameDisplay">Membro</div>
-            <div class="era" id="eraDisplay">Era</div>
-            <div class="stats" id="statsDisplay"></div>
-        </div>
+    <div class="status-board">
+        <div class="status-shows" id="showCounter">Shows: 0/10 🎤</div>
+        <div class="status-hype" id="hypeCounter">Hype: 100% 💚</div>
     </div>
 
-    <div id="tourScreen">
-        <h1>🌍 World Tour</h1>
-        
-        <div class="status-bar">
-            <div class="stage" id="showCounter">Show: 1/10</div>
-            <div class="hype" id="hypeCounter">Hype da Banda: 100%</div>
+    <div class="roulette-container">
+        <div class="roulette-screen" id="rouletteScreen">
+            <div class="result-title" id="screenTitle">Gire a Roleta!</div>
+            <div class="result-desc" id="screenDesc">O que a turnê reserva para hoje?</div>
         </div>
-
-        <div class="event-box">
-            <div class="event-title" id="eventTitle">Chegando na Arena...</div>
-            <div class="event-desc" id="eventDesc">A multidão está gritando. O que vai acontecer esta noite?</div>
-            <div class="event-req" id="eventReq">Desafio: ???</div>
-        </div>
-
-        <p class="action-text">Clique em um membro da sua equipe abaixo para enfrentar o desafio:</p>
-        
-        <div class="team-container" id="teamSlotsTour">
-            </div>
+        <button id="btnGirar" onclick="iniciarGiro()">Girar o Destino!</button>
     </div>
+
+    <h2>Sua Equipe (Comitiva)</h2>
+    <div class="team-container" id="teamContainer">
+        </div>
 
     <script>
-        const membros = [
-            { id: 1, nome: "Harry Styles", era: "Four", folego: 85, vocal: 90, carisma: 100 },
-            { id: 2, nome: "Zayn Malik", era: "Take Me Home", folego: 80, vocal: 100, carisma: 85 },
-            { id: 3, nome: "Niall Horan", era: "Midnight Memories", folego: 95, vocal: 80, carisma: 90 },
-            { id: 4, nome: "Louis Tomlinson", era: "Up All Night", folego: 85, vocal: 85, carisma: 95 },
-            { id: 5, nome: "Liam Payne", era: "Made in the A.M.", folego: 100, vocal: 90, carisma: 80 },
-            { id: 6, nome: "Harry Styles", era: "Up All Night", folego: 80, vocal: 85, carisma: 90 }
+        let hype = 100;
+        let shows = 0;
+        let equipe = [];
+
+        // O Sistema de Pesos! Quanto menor o número, mais raro.
+        const categorias = [
+            { tipo: 'show', peso: 45 },
+            { tipo: 'problema', peso: 25 },
+            { tipo: 'item', peso: 15 },
+            { tipo: 'recrutamento', peso: 15 }
         ];
 
-        let equipe = [];
-        const MAX_EQUIPE = 5;
-        let hypeBanda = 100;
-        let showAtual = 1;
-        const TOTAL_SHOWS = 10;
+        // Personagens e suas raridades (pesos)
+        const personagens = [
+            { id: 1, nome: "Harry Styles", papel: "Vocalista", icone: "✨", peso: 5 }, // Muito Raro
+            { id: 2, nome: "Zayn Malik", papel: "High Note", icone: "🚬", peso: 10 },  // Raro
+            { id: 3, nome: "Niall Horan", papel: "Guitarra", icone: "🎸", peso: 15 },
+            { id: 4, nome: "Liam Payne", papel: "Pilar", icone: "⚓", peso: 15 },
+            { id: 5, nome: "Louis Tomlinson", papel: "Líder", icone: "🧭", peso: 15 },
+            { id: 6, nome: "Paul Higgins", papel: "Segurança", icone: "🛡️", peso: 40 }, // Comum
+            { id: 7, nome: "Lou Teasdale", papel: "Estilista", icone: "✂️", peso: 40 }, // Comum
+            { id: 8, nome: "Simon Cowell", papel: "Chefe Chato", icone: "🕴️", peso: 5 } // Carta troll!
+        ];
 
-        // Lógica do Draft
-        function girarRoleta() {
-            if (equipe.length >= MAX_EQUIPE) return;
+        const imprevistos = [
+            "Paparazzi invadiu o hotel! (-15% Hype)",
+            "Alguém caiu no palco! (-20% Hype)",
+            "A van quebrou no caminho! (-10% Hype)",
+            "Rumores falsos no Twitter! (-15% Hype)",
+            "Zayn não quer acordar! (-20% Hype)"
+        ];
 
-            const filtro = document.getElementById('eraFilter').value;
-            let filtrados = filtro !== "Todas" ? membros.filter(m => m.era === filtro) : membros;
+        const itens = [
+            "Achou a Cenoura do Louis! (+15% Hype)",
+            "Bebeu o Chá de Camomila! (+20% Hype)",
+            "Fãs cantaram junto! (+25% Hype)",
+            "Um dia de folga na piscina! (+30% Hype)"
+        ];
 
-            if (filtrados.length === 0) { alert("Sem cartas!"); return; }
-
-            const sorteado = filtrados[Math.floor(Math.random() * filtrados.length)];
-            equipe.push(sorteado);
-            
-            atualizarSlotDraft(equipe.length - 1, sorteado);
-            mostrarCarta(sorteado);
-
-            document.getElementById('statusDraft').innerText = `Equipe (${equipe.length}/${MAX_EQUIPE})`;
-
-            if (equipe.length === MAX_EQUIPE) {
-                document.getElementById('btnGirar').style.display = 'none';
-                document.getElementById('eraFilter').style.display = 'none';
-                document.getElementById('btnTurne').style.display = 'inline-block';
+        // Função mágica que escolhe coisas baseadas no PESO (probabilidade)
+        function sortearComPeso(lista) {
+            const pesoTotal = lista.reduce((soma, item) => soma + item.peso, 0);
+            let random = Math.random() * pesoTotal;
+            for (let i = 0; i < lista.length; i++) {
+                if (random < lista[i].peso) return lista[i];
+                random -= lista[i].peso;
             }
         }
 
-        function atualizarSlotDraft(index, membro) {
-            const slot = document.getElementById(`slot-${index}`);
-            slot.classList.add('filled');
-            slot.innerHTML = `<div class="slot-name">${membro.nome}</div><div style="font-size: 9px; color: #888;">${membro.era}</div><div class="slot-stats">F:${membro.folego} | V:${membro.vocal} | C:${membro.carisma}</div>`;
+        function atualizarStatus() {
+            document.getElementById('showCounter').innerText = `Shows: ${shows}/10 🎤`;
+            document.getElementById('hypeCounter').innerText = `Hype: ${hype}% 💚`;
         }
 
-        function mostrarCarta(membro) {
-            const card = document.getElementById('resultCard');
-            document.getElementById('nameDisplay').innerText = membro.nome;
-            document.getElementById('eraDisplay').innerText = membro.era;
-            document.getElementById('statsDisplay').innerHTML = `Fôlego: ${membro.folego} | Vocal: ${membro.vocal} | Carisma: ${membro.carisma}`;
-            card.style.display = 'block';
-        }
+        function iniciarGiro() {
+            const btn = document.getElementById('btnGirar');
+            const screen = document.getElementById('rouletteScreen');
+            const title = document.getElementById('screenTitle');
+            const desc = document.getElementById('screenDesc');
 
-        // Transição para a Turnê
-        function iniciarTurne() {
-            document.getElementById('draftScreen').style.display = 'none';
-            document.getElementById('tourScreen').style.display = 'block';
+            btn.disabled = true;
+            screen.classList.add('spinning');
             
-            // Copia os membros sorteados para os botões clicáveis da tela de turnê
-            const containerTour = document.getElementById('teamSlotsTour');
-            equipe.forEach((membro, index) => {
-                containerTour.innerHTML += `
-                    <div class="slot filled" onclick="enfrentarDesafio(${index})">
-                        <div class="slot-name">${membro.nome}</div>
-                        <div style="font-size: 9px; color: #888;">${membro.era}</div>
-                        <div class="slot-stats">F:${membro.folego} | V:${membro.vocal} | C:${membro.carisma}</div>
-                    </div>
-                `;
-            });
-
-            gerarNovoShow();
+            // Efeito visual de caça-níquel rodando
+            let tempo = 0;
+            const intervalo = setInterval(() => {
+                const cores = ['color-show', 'color-bad', 'color-item', 'color-recruit'];
+                const textos = ["🎶 SHOW?", "💥 TRETA?", "🎁 ITEM?", "👤 ALGUÉM?"];
+                const rnd = Math.floor(Math.random() * 4);
+                
+                title.className = `result-title ${cores[rnd]}`;
+                title.innerText = textos[rnd];
+                desc.innerText = "...";
+                
+                tempo += 100;
+                if (tempo >= 2000) { // Gira por 2 segundos
+                    clearInterval(intervalo);
+                    screen.classList.remove('spinning');
+                    aplicarResultado();
+                }
+            }, 100);
         }
 
-        // Sistema de Batalha (Mecânica Central)
-        let desafioAtual = {};
-
-        function gerarNovoShow() {
-            // Um banco de dados rápido de problemas que podem acontecer num show
-            const eventos = [
-                { titulo: "Solo de Alta Frequência", desc: "O microfone principal falhou! Alguém precisa projetar a voz na raça.", atributo: "vocal", valor: 90 },
-                { titulo: "Paparazzi no Hotel", desc: "Tumulto na saída do hotel atrasou o grupo. Alguém precisa acalmar as fãs na porta.", atributo: "carisma", valor: 95 },
-                { titulo: "Show de 3 Horas", desc: "A setlist foi estendida hoje e está muito calor. Quem aguenta pular no palco?", atributo: "folego", valor: 90 },
-                { titulo: "Acordes Errados", desc: "A banda de apoio errou o tempo. Alguém precisa improvisar e encantar o público.", atributo: "carisma", valor: 90 },
-                { titulo: "High Note no Wembley", desc: "Chegou a hora da nota mais alta de 'You & I'. É agora ou nunca.", atributo: "vocal", valor: 95 }
-            ];
-
-            desafioAtual = eventos[Math.floor(Math.random() * eventos.length)];
+        function aplicarResultado() {
+            const btn = document.getElementById('btnGirar');
+            const title = document.getElementById('screenTitle');
+            const desc = document.getElementById('screenDesc');
             
-            document.getElementById('eventTitle').innerText = desafioAtual.titulo;
-            document.getElementById('eventDesc').innerText = desafioAtual.desc;
-            
-            // Traduz a exigência para a tela
-            let nomeAtributo = desafioAtual.atributo === "vocal" ? "Vocal" : desafioAtual.atributo === "folego" ? "Fôlego" : "Carisma";
-            document.getElementById('eventReq').innerText = `Exige: ${desafioAtual.valor} de ${nomeAtributo}`;
+            const categoriaSorteada = sortearComPeso(categorias);
+
+            if (categoriaSorteada.tipo === 'show') {
+                shows++;
+                title.className = 'result-title color-show';
+                title.innerText = "🎶 SHOW ÉPICO!";
+                desc.innerText = "Estádio lotado! A turnê avançou.";
+            } 
+            else if (categoriaSorteada.tipo === 'problema') {
+                const problema = imprevistos[Math.floor(Math.random() * imprevistos.length)];
+                // Extrai o número do dano da string (ex: -15)
+                const dano = parseInt(problema.match(/\d+/)[0]);
+                hype -= dano;
+                
+                title.className = 'result-title color-bad';
+                title.innerText = "💥 TRETA!";
+                desc.innerText = problema;
+            }
+            else if (categoriaSorteada.tipo === 'item') {
+                const item = itens[Math.floor(Math.random() * itens.length)];
+                const cura = parseInt(item.match(/\d+/)[0]);
+                hype += cura;
+                if(hype > 100) hype = 100; // Limita em 100%
+
+                title.className = 'result-title color-item';
+                title.innerText = "🎁 SORTE!";
+                desc.innerText = item;
+            }
+            else if (categoriaSorteada.tipo === 'recrutamento') {
+                // Filtra para não recrutar quem já tá na equipe
+                const personagensDisponiveis = personagens.filter(p => !equipe.includes(p.id));
+                
+                if (personagensDisponiveis.length === 0) {
+                    title.className = 'result-title color-show';
+                    title.innerText = "🚐 VAN LOTADA";
+                    desc.innerText = "Você já recrutou todo mundo! Ganhou um show grátis.";
+                    shows++;
+                } else {
+                    const novoMembro = sortearComPeso(personagensDisponiveis);
+                    equipe.push(novoMembro.id);
+                    adicionarNaEquipe(novoMembro);
+                    
+                    title.className = 'result-title color-recruit';
+                    title.innerText = "👤 RECRUTADO!";
+                    desc.innerText = `Você puxou ${novoMembro.nome} para a van da turnê!`;
+
+                    // Punição se pegar o Simon Cowell
+                    if(novoMembro.nome === "Simon Cowell") {
+                        desc.innerText = "Vish, o Simon Cowell apareceu para cobrar resultados! (-10% Hype)";
+                        hype -= 10;
+                    }
+                }
+            }
+
+            atualizarStatus();
+            verificarFimDeJogo(btn);
         }
 
-        function enfrentarDesafio(indexMembro) {
-            const membroEscolhido = equipe[indexMembro];
-            const valorMembro = membroEscolhido[desafioAtual.atributo]; // Pega o atributo específico (ex: vocal) do membro
+        function adicionarNaEquipe(membro) {
+            const container = document.getElementById('teamContainer');
+            container.innerHTML += `
+                <div class="slot member">
+                    <div class="slot-icon">${membro.icone}</div>
+                    <div class="slot-name">${membro.nome}</div>
+                    <div class="slot-role">${membro.papel}</div>
+                </div>
+            `;
+        }
 
-            if (valorMembro >= desafioAtual.valor) {
-                // SUCESSO!
-                alert(`✨ SUCESSO! ${membroEscolhido.nome} mandou muito bem! A multidão foi à loucura.`);
+        function verificarFimDeJogo(btn) {
+            if (hype <= 0) {
+                document.getElementById('hypeCounter').innerText = `Hype: 0% 💔`;
+                setTimeout(() => {
+                    alert("💔 GAME OVER! A turnê faliu, os fãs foram embora e o Hype acabou.");
+                    location.reload();
+                }, 500);
+            } else if (shows >= 10) {
+                setTimeout(() => {
+                    alert("🏆 VOCÊ VENCEU! A Turnê Mundial de 10 shows foi um sucesso histórico!");
+                    location.reload();
+                }, 500);
             } else {
-                // FALHA!
-                alert(`❌ FALHA! ${membroEscolhido.nome} não aguentou a pressão (Tinha ${valorMembro}, precisava de ${desafioAtual.valor}). A banda perdeu 20% de Hype.`);
-                hypeBanda -= 20;
-                document.getElementById('hypeCounter').innerText = `Hype da Banda: ${hypeBanda}%`;
-            }
-
-            // Verifica Game Over
-            if (hypeBanda <= 0) {
-                alert("💔 GAME OVER! A turnê foi cancelada. O Hype chegou a zero.");
-                location.reload(); // Recarrega a página para reiniciar
-                return;
-            }
-
-            // Avança para o próximo show
-            showAtual++;
-            if (showAtual > TOTAL_SHOWS) {
-                alert("🏆 VOCÊ VENCEU! A Turnê Mundial foi um sucesso absoluto!");
-                location.reload();
-            } else {
-                document.getElementById('showCounter').innerText = `Show: ${showAtual}/${TOTAL_SHOWS}`;
-                gerarNovoShow();
+                btn.disabled = false; // Libera o botão pro próximo giro se não acabou
             }
         }
     </script>
